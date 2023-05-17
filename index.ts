@@ -21,13 +21,13 @@ const TO_TOKEN = WETH;
   const provider = ethers.getDefaultProvider('homestead');
   const uniswapContract = new ethers.Contract(uniswapAddress, uniswapABI, provider);
 
-  // Using contract to get determine number of TO_TOKENS given balance and FROM_TOKEN
+  // Using contract to determine number of TO_TOKENS given balance and FROM_TOKEN
   let numOfToTokens = await uniswapContract.getAmountsOut(FROM_BALANCE,[FROM_TOKEN.address, TO_TOKEN.address]);
 
   const decimalPoints = 10**(TO_TOKEN.decimals - FROM_TOKEN.decimals);
 
-  const swapBalance = BigNumber.from(numOfToTokens[1]).div(decimalPoints).toString() + "." + BigNumber.from(numOfToTokens[1]).mod(decimalPoints).toString();
-  console.info(`Estimated swap balance: ${swapBalance} ${TO_TOKEN.symbol}`);
+  const swapBalance = parseFloat(BigNumber.from(numOfToTokens[1]).div(decimalPoints).toString() + "." + BigNumber.from(numOfToTokens[1]).mod(decimalPoints).toString());
+  console.info(`Estimated swap balance: ${swapBalance.toFixed(2)} ${TO_TOKEN.symbol}`);
 
   // Using coingecko API to get spot values of both from and to token
   const coingeckoResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${FROM_TOKEN.coingecko}%2c${TO_TOKEN.coingecko}&vs_currencies=usd&precision=18`);
@@ -38,7 +38,7 @@ const TO_TOKEN = WETH;
 
   // Computing slippage on the swap
   let preSwapValue = parseFloat(fromTokenSpotValue) * parseFloat(FROM_BALANCE.toString());
-  let postSwapValue = parseFloat(toTokenSpotValue) * parseFloat(swapBalance);
+  let postSwapValue = parseFloat(toTokenSpotValue) * swapBalance;
 
   const slippagePercent = ((Math.abs(postSwapValue - preSwapValue)) / preSwapValue)
 

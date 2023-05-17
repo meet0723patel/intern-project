@@ -44,7 +44,7 @@ var FROM_TOKEN = tokens_1.USDC;
 var FROM_BALANCE = ethers_1.BigNumber.from('1000000');
 var TO_TOKEN = tokens_1.WETH;
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var uniswapAddress, jsonData, uniswapABI, provider, uniswapContract, numOfToTokens, decimalPoints, swapBalance, coingeckoResponse, listOfSpotValues, fromTokenSpotValue, toTokenSpotValue, preSwap, postSwap, slippagePercent;
+    var uniswapAddress, jsonData, uniswapABI, provider, uniswapContract, numOfToTokens, decimalPoints, swapBalance, coingeckoResponse, listOfSpotValues, fromTokenSpotValue, toTokenSpotValue, preSwapValue, postSwapValue, slippagePercent;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -58,8 +58,8 @@ var TO_TOKEN = tokens_1.WETH;
             case 1:
                 numOfToTokens = _a.sent();
                 decimalPoints = Math.pow(10, (TO_TOKEN.decimals - FROM_TOKEN.decimals));
-                swapBalance = ethers_1.BigNumber.from(numOfToTokens[1]).div(decimalPoints).toString() + "." + ethers_1.BigNumber.from(numOfToTokens[1]).mod(decimalPoints).toString();
-                console.info("Estimated swap balance: ".concat(swapBalance, " ").concat(TO_TOKEN.symbol));
+                swapBalance = parseFloat(ethers_1.BigNumber.from(numOfToTokens[1]).div(decimalPoints).toString() + "." + ethers_1.BigNumber.from(numOfToTokens[1]).mod(decimalPoints).toString());
+                console.info("Estimated swap balance: ".concat(swapBalance.toFixed(2), " ").concat(TO_TOKEN.symbol));
                 return [4 /*yield*/, fetch("https://api.coingecko.com/api/v3/simple/price?ids=".concat(FROM_TOKEN.coingecko, "%2c").concat(TO_TOKEN.coingecko, "&vs_currencies=usd&precision=18"))];
             case 2:
                 coingeckoResponse = _a.sent();
@@ -68,10 +68,9 @@ var TO_TOKEN = tokens_1.WETH;
                 listOfSpotValues = _a.sent();
                 fromTokenSpotValue = listOfSpotValues[FROM_TOKEN.coingecko].usd;
                 toTokenSpotValue = listOfSpotValues[TO_TOKEN.coingecko].usd;
-                preSwap = parseFloat(fromTokenSpotValue) * parseFloat(FROM_BALANCE.toString());
-                postSwap = parseFloat(toTokenSpotValue) * parseFloat(swapBalance);
-                console.info(preSwap, postSwap);
-                slippagePercent = ((Math.abs(postSwap - preSwap)) / preSwap);
+                preSwapValue = parseFloat(fromTokenSpotValue) * parseFloat(FROM_BALANCE.toString());
+                postSwapValue = parseFloat(toTokenSpotValue) * swapBalance;
+                slippagePercent = ((Math.abs(postSwapValue - preSwapValue)) / preSwapValue);
                 console.info("Slippage: ".concat((slippagePercent * 100).toFixed(2), "%"));
                 return [2 /*return*/];
         }
